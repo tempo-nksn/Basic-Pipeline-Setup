@@ -22,10 +22,10 @@ func CreateRouter() *gin.Engine {
 func StartServer(router *gin.Engine) {
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = ":8080"
+		port = "8080"
 	}
 	srv := &http.Server{
-		Addr:    port,
+		Addr:    ":" + port,
 		Handler: router,
 	}
 
