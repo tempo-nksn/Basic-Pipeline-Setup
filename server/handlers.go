@@ -23,8 +23,10 @@ func dummyPost(c *gin.Context) {
 }
 
 // getTaxi calculates 3 random taxi location neat the user
+// we are using rand func
+// The randomness is [-0.002500, 0.002500] degrees for both latitude and longitude
 // In future it will respond with the location of the nearby taxis
-func getNearByTaxi(c *gin.Context) {
+func getNearByTaxis(c *gin.Context) {
 	var userLocation models.Location
 
 	r := c.Request
