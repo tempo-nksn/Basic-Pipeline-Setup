@@ -1,6 +1,6 @@
 package main
 
-import "Tempo-Backend/server"
+import "github.com/Tempo-Backend/server"
 
 func main() {
 	router := server.CreateRouter()
