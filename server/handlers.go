@@ -9,9 +9,9 @@ import (
 	"strconv"
 )
 
-//func hello(c *gin.Context) {
-//	c.String(200, "Hello User, your taxi is booked")
-//}
+func hello(c *gin.Context) {
+	c.String(200, "Hello User, your taxi is booked")
+}
 
 func dummyPost(c *gin.Context) {
 	var str struct {
