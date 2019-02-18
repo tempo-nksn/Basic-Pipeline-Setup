@@ -10,6 +10,10 @@ func hello(c *gin.Context) {
 }
 
 func dummyPost(c *gin.Context) {
+	var str struct {
+		Name string `json:"name"`
+	}
+	c.BindJSON(&str)
 	fmt.Printf("I am posting to ios")
-	c.JSON(200, "here is your post")
+	c.JSON(200, str)
 }
