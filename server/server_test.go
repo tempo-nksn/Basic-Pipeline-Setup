@@ -37,7 +37,7 @@ var _ = Describe("Server", func() {
 			})
 
 			It("Returns the String 'Hello World'", func() {
-				Expect(response.Body.String()).To(Equal("Hello World"))
+				Expect(response.Body.String()).To(Equal("Hello User, your taxi is booked"))
 			})
 		})
 	})

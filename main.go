@@ -1,6 +1,6 @@
 package main
 
-import "github.com/codechaitu/circleci-heroku/server"
+import "Tempo-Backend/server"
 
 func main() {
 	router := server.CreateRouter()
