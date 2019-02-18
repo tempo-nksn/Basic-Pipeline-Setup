@@ -32,6 +32,14 @@ func getNearByTaxis(c *gin.Context) {
 	r := c.Request
 	m,_ := url.ParseQuery(r.URL.RawQuery)
 
+	if _, ok := m["latitude"]; !ok {
+		c.JSON(400, "User Location Missing!!!!!")
+		return
+	}
+	if _, ok := m["longitude"]; !ok {
+		c.JSON(400, "User Location Missing!!!!!")
+		return
+	}
 	userLocation.Latitude = m["latitude"][0]
 	userLocation.Longitude = m["longitude"][0]
 	latitude,_ := strconv.ParseFloat(userLocation.Latitude, 64)
