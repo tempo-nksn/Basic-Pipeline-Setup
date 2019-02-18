@@ -4,7 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	//. "circleci/server"
+
 	"net/http"
 	"net/http/httptest"
 )
