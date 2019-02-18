@@ -42,7 +42,7 @@ func getNearByTaxis(c *gin.Context) {
 
 	//c.JSON(200, userLocation)
 	var numberOfTaxis  = 3
-	var taxiLocation = make([]models.Location, 3)
+	var taxiLocation = make([]models.Location, numberOfTaxis)
 	for count := 0; count<numberOfTaxis; count++ {
 		taxiLocation[count].Latitude = fmt.Sprintf("%0.6f",(latitude + float64(rand.Intn(5000) - 2500)/100000))
 		taxiLocation[count].Longitude = fmt.Sprintf("%0.6f",(longitude + float64(rand.Intn(5000) - 2500)/100000))
