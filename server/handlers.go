@@ -22,7 +22,7 @@ func dummyPost(c *gin.Context) {
 	c.JSON(200, str)
 }
 
-// getTaxi calculates 3 random taxi location neat the user
+// getNearByTaxis calculates 3 random taxi location neat the user
 // we are using rand func
 // The randomness is [-0.002500, 0.002500] degrees for both latitude and longitude
 // In future it will respond with the location of the nearby taxis
@@ -41,9 +41,9 @@ func getNearByTaxis(c *gin.Context) {
 	fmt.Printf("%f",longitude)
 
 	//c.JSON(200, userLocation)
-
-	var taxiLocation [3]models.Location
-	for count := 0; count<3; count++ {
+	var numberOfTaxis  = 3
+	var taxiLocation [numberOfTaxis]models.Location
+	for count := 0; count<numberOfTaxis; count++ {
 		taxiLocation[count].Latitude = fmt.Sprintf("%0.6f",(latitude + float64(rand.Intn(5000) - 2500)/100000))
 		taxiLocation[count].Longitude = fmt.Sprintf("%0.6f",(longitude + float64(rand.Intn(5000) - 2500)/100000))
 	}
