@@ -41,6 +41,7 @@ type GooglePath struct {
 
 type Route struct {
 	DBModel
+	Distance 	int
 	Duration    int
 	Fare        int
 	GooglePath  []GooglePath
