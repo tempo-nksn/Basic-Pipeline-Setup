@@ -164,16 +164,10 @@ func getETA(duration float64) int {
 }
 
 func testFromDB(c *gin.Context) {
-	id, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		c.AbortWithStatus(400)
-		return
-	}
-
 	db := getDB(c)
-	var taxi models.Taxi
-	db.Where("taxi_no = ?", id).Find(&taxi)
+	var taxis []models.Taxi
+	db.Find(&taxis)
 
-	fmt.Println(taxi)
-	c.JSON(200, taxi)
+	fmt.Println(taxis)
+	c.JSON(200, taxis)
 }
