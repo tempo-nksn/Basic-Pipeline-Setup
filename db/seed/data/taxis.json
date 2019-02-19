@@ -1,0 +1,18 @@
+[
+    {
+        "NumberPlate":            "ABC123",
+        "CarType" :               "SEDAN",
+        "CurrentLocation":        "56.346734,78.078924",
+        "Capacity"        :       4,
+        "CurrentNumOfTravellers": 0,
+        "Status"                 :  "Free"
+    },
+    {
+        "NumberPlate":            "XYZ123",
+        "CarType" :               "LIMO",
+        "CurrentLocation":        "36.346734,38.078924",
+        "Capacity"        :       3,
+        "CurrentNumOfTravellers": 1,
+        "Status"                 :  "Active"
+    }
+]
