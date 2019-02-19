@@ -363,7 +363,7 @@ func getRide(c *gin.Context) {
 
 			if isUserDestInRoute {
 				// Return the taxi id
-				c.JSON(200, taxi.ID)
+				c.JSON(200, taxi)
 				return
 			}
 
@@ -378,7 +378,7 @@ func getRide(c *gin.Context) {
 
 			if isRouteDestInUserRoute {
 				// Return the taxi id
-				c.JSON(200, taxi.ID)
+				c.JSON(200, taxi)
 				return
 			}
 		}
@@ -388,7 +388,7 @@ func getRide(c *gin.Context) {
 	var taxi models.Taxi
 	database.Where("status = ?", statusFree).First(&taxi)
 	if taxi.NumberPlate != "" {
-		c.JSON(200, taxi.ID)
+		c.JSON(200, taxi)
 		return
 	}
 
