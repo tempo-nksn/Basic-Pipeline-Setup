@@ -13,14 +13,10 @@ import (
 	"github.com/jinzhu/gorm"
 	"github.com/kr/pretty"
 	"github.com/tempo-nksn/Tempo-Backend/constants"
+	"github.com/tempo-nksn/Tempo-Backend/db"
 	"github.com/tempo-nksn/Tempo-Backend/models"
 	"googlemaps.github.io/maps"
 )
-
-type places struct {
-	origin      string
-	destination string
-}
 
 // RouteInfoStrcut is for getting all information between source and destination
 type RouteInfoStrcut struct {
@@ -86,11 +82,12 @@ func getNearByTaxis(c *gin.Context) {
 
 }
 
-func getPolyLine(c *gin.Context) {
+// all fuction supporting the API fucntions
+func getRoute(c *gin.Context) {
 
-	r := c.Request
-	m, _ := url.ParseQuery(r.URL.RawQuery)
-
+	// getting  Source and destination
+	request := c.Request
+	m, _ := url.ParseQuery(request.URL.RawQuery)
 	if _, ok := m["src"]; !ok {
 		c.JSON(400, "user source Missing!!!!!")
 		return
@@ -99,29 +96,23 @@ func getPolyLine(c *gin.Context) {
 		c.JSON(400, "User destination Missing!!!!!")
 		return
 	}
+	origin := m["src"][0]
+	destination := m["dest"][0]
 
-	srcAndDest := places{origin: m["src"][0], destination: m["dest"][0]}
-	allPolyline := getRoute(srcAndDest)
-	c.JSON(200, allPolyline)
-}
-
-// all fuction supporting the API fucntions
-
-func getRoute(obj places) RouteInfoStrcut {
-
+	//accessing Google map api
 	googleKey := os.Getenv("MAPS_KEY")
-	c, err := maps.NewClient(maps.WithAPIKey(googleKey))
+	gmap, err := maps.NewClient(maps.WithAPIKey(googleKey))
 
 	if err != nil {
 		log.Fatalf("fatal error: %s", err)
 	}
 	r := &maps.DirectionsRequest{
-		Origin:      obj.origin,
-		Destination: obj.destination,
+		Origin:      origin,
+		Destination: destination,
 	}
 	r.Mode = maps.TravelModeDriving
 	r.Units = maps.UnitsMetric
-	route, _, err := c.Directions(context.Background(), r)
+	route, _, err := gmap.Directions(context.Background(), r)
 	if err != nil {
 		log.Fatalf("fatal error: %s", err)
 	}
@@ -129,26 +120,37 @@ func getRoute(obj places) RouteInfoStrcut {
 	var maplegs *maps.Leg
 	maplegs = route[0].Legs[0]
 	pretty.Println(maplegs)
-	var allPolyline []string
-	var polyline string
+
+	var fullRoute models.Route
+	db.DB.Create(&fullRoute)
 
 	for i := 0; i < len(maplegs.Steps); i++ {
 
-		polyline = maplegs.Steps[i].Polyline.Points
-		allPolyline = append(allPolyline, polyline)
+		polyline := maplegs.Steps[i].Polyline.Points
+		var GooglePath models.GooglePath
+		db.DB.Create(&GooglePath)
+
+		GooglePath.RouteID = fullRoute.ID
+		GooglePath.Path = polyline
+		fullRoute.GooglePath = append(fullRoute.GooglePath, GooglePath)
+		db.DB.Save(&GooglePath)
 	}
-	routeInfo := RouteInfoStrcut{Allpolyline: allPolyline, Distance: route[0].Legs[0].Distance.Meters, Duration: route[0].Legs[0].Duration.Minutes(), Price: getfare(route[0].Legs[0].Distance.Meters), ETA: getETA(route[0].Legs[0].Duration.Minutes())}
 
-	return routeInfo
+	fullRoute.Duration = int(route[0].Legs[0].Duration.Minutes())
+	fullRoute.Distance = route[0].Legs[0].Distance.Meters
+	fullRoute.Fare = getFare(route[0].Legs[0].Distance.Meters)
+	fullRoute.Source = origin
+	fullRoute.Destination = destination
+	db.DB.Save(&fullRoute)
 
+	c.JSON(200, fullRoute)
 }
 
-func getfare(distance int) int {
+func getFare(distance int) int {
 	basePricePerMeter := 3
-	return distance * basePricePerMeter
+	return (distance / 1000) * basePricePerMeter
 
 }
-
 func getETA(duration float64) int {
 	minWaitingTime, maxWaitingTime := 5, 15
 
