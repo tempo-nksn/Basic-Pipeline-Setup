@@ -10,7 +10,9 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/jinzhu/gorm"
 	"github.com/kr/pretty"
+	"github.com/tempo-nksn/Tempo-Backend/constants"
 	"github.com/tempo-nksn/Tempo-Backend/models"
 	"googlemaps.github.io/maps"
 )
@@ -27,6 +29,10 @@ type RouteInfoStrcut struct {
 	Distance    int
 	Price       int
 	ETA         int
+}
+
+func getDB(c *gin.Context) *gorm.DB {
+	return c.MustGet(constants.ContextDB).(*gorm.DB)
 }
 
 func hello(c *gin.Context) {
@@ -155,4 +161,13 @@ func getETA(duration float64) int {
 	} else {
 		return minWaitingTime
 	}
+}
+
+func testFromDB(c *gin.Context) {
+	db := getDB(c)
+	var taxis []models.Taxi
+	db.Find(&taxis)
+
+	fmt.Println(taxis)
+	c.JSON(200, taxis)
 }
