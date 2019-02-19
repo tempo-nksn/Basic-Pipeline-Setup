@@ -14,6 +14,7 @@ func setupRoutes(router *gin.Engine) {
 	v1.GET("/ride", getRide)
 	v1.POST("/bookingConfirmation", bookingConfirmation)
 	v1.POST("/startRide", startRide)
+	v1.POST("/finishRide", finishRide)
 
 	v1.GET("/bookingDataBaseTest", bookingDBTest)
 	v1.GET("/routeDBTest", routeDBTest)
