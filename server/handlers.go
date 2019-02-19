@@ -322,12 +322,10 @@ func getRide(c *gin.Context) {
 
 	const statusActive = "Active"
 	const statusFree = "Free"
-	const maxDistance = 10 // Maximum distance of the user from a existing path for him/her to share a ride on that path
+	const maxDistance = 100 // Maximum distance of the user from a existing path for him/her to share a ride on that path
 
 	var isSrcInRoute bool
 	database.Where("status = ?", statusActive).Find(&taxis)
-
-	fmt.Println("TOtal number of Active taxi are", len(taxis))
 
 	if len(taxis) > 0 {
 		// FInd if any existing active taxi can be shared
@@ -337,7 +335,6 @@ func getRide(c *gin.Context) {
 			database.Where("taxi_id = ? and status = ?", taxi.ID, statusActive).Preload("GooglePath").Find(&route)
 
 			if route.ID < 1 {
-				fmt.Println("No Active route found for taxi_id %d", taxi.ID)
 				continue
 			}
 
@@ -360,7 +357,6 @@ func getRide(c *gin.Context) {
 			isSrcInRoute = false
 			for idx := 0; idx < len(allLatLang); idx++ {
 				if distPointLine(userSrcLat, userSrcLng, allLatLang[idx]) < maxDistance {
-					fmt.Println("Distance of source idx ",idx, "   ", distPointLine(userSrcLat, userSrcLng, allLatLang[idx]))
 					isSrcInRoute = true
 					break
 				}
@@ -375,7 +371,6 @@ func getRide(c *gin.Context) {
 			isUserDestInRoute := false
 			for idx := 0; idx < len(allLatLang); idx++ {
 				if (userDestLng == routeDestLng && userDestLat == routeDestLat) || (distPointLine(userDestLat, userDestLng, allLatLang[idx]) < maxDistance) {
-					fmt.Println("Distance of Destination idx ", idx, "      ", distPointLine(userDestLat, userDestLng, allLatLang[idx]))
 					isUserDestInRoute = true
 					break
 				}
@@ -390,8 +385,7 @@ func getRide(c *gin.Context) {
 			// check if the taxi destination lies in userRoute
 			var isRouteDestInUserRoute bool
 			for idx := 0; idx < len(userRouteLatLang); idx++ {
-				if distPointLine(routeDestLat, routeDestLng, userRouteLatLang[idx]) < maxDistance {
-					fmt.Println(distPointLine(routeDestLat, routeDestLng, userRouteLatLang[idx]))
+				if (userDestLng == routeDestLng && userDestLat == routeDestLat) || (distPointLine(routeDestLat, routeDestLng, userRouteLatLang[idx]) < maxDistance) {
 					isRouteDestInUserRoute = true
 					break
 				}
@@ -403,8 +397,6 @@ func getRide(c *gin.Context) {
 				return
 			}
 		}
-
-		fmt.Println("Couldnot FIND and ACTIVE Taxi")
 	}
 
 	// Give user the free taxi
