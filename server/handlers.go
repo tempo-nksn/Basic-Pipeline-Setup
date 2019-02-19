@@ -173,3 +173,10 @@ func testFromDB(c *gin.Context) {
 	fmt.Println(taxis)
 	c.JSON(200, taxis)
 }
+
+func createRider(c *gin.Context) {
+	var rider models.Rider
+	db.DB.Create(&rider)
+
+	c.JSON(200, rider.ID)
+}
