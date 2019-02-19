@@ -374,7 +374,7 @@ func getRide(c *gin.Context) {
 			// If the source matches then check whether on eof the destination lies near the route of the other
 			isUserDestInRoute := false
 			for idx := 0; idx < len(allLatLang); idx++ {
-				if distPointLine(userDestLat, userDestLng, allLatLang[idx]) < maxDistance {
+				if (userDestLng == routeDestLng && userDestLat == routeDestLat) || (distPointLine(userDestLat, userDestLng, allLatLang[idx]) < maxDistance) {
 					fmt.Println("Distance of Destination idx ", idx, "      ", distPointLine(userDestLat, userDestLng, allLatLang[idx]))
 					isUserDestInRoute = true
 					break
