@@ -216,3 +216,12 @@ func bookingDBTest(c *gin.Context) {
 	fmt.Println(bookings)
 	c.JSON(200, bookings)
 }
+
+func routeDBTest(c *gin.Context) {
+	db := getDB(c)
+	var route []models.Route
+	db.Find(&route)
+
+	fmt.Println(route)
+	c.JSON(200, route)
+}
