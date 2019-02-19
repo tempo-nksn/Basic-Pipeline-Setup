@@ -11,5 +11,10 @@ var DB *gorm.DB
 // Init sets the given database connection as the de-facto connection for this app
 func Init(db *gorm.DB) {
 	DB = db
-	DB.AutoMigrate(&models.Taxi{})
+	DB.AutoMigrate(
+		&models.Taxi{},
+		&models.Route{},
+		&models.Rider{},
+		&models.GooglePath{},
+		&models.Booking{})
 }
