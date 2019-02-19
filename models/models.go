@@ -41,24 +41,24 @@ type GooglePath struct {
 
 type Route struct {
 	DBModel
-	TaxiID		uint	// initialised when a taxi is booked for a given route
-	Distance 	int
+	TaxiID      uint // initialised when a taxi is booked for a given route
+	Distance    int
 	Duration    int
 	Fare        int
 	GooglePath  []GooglePath
 	Source      string
 	Destination string
-	Status 		string	// can be Active or Passive
+	Status      string // can be Active or Passive
 }
 
 type Booking struct {
 	DBModel
-	RouteID        uint
-	Route          Route
-	TaxiID         uint
-	Taxi           Taxi
-	RiderID        uint
-	Rider          Rider
-	ETA            int 		// How much time a user has to wait till he gets a taxi.
-	Status		   string	// Can be To_start, Active or Finished
+	RouteID uint
+	//Route          Route
+	TaxiID uint
+	//Taxi           Taxi
+	RiderID uint
+	//Rider          Rider
+	ETA    int    // How much time a user has to wait till he gets a taxi.
+	Status string // Can be To_start, Active or Finished
 }
