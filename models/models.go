@@ -41,7 +41,7 @@ type GooglePath struct {
 
 type Route struct {
 	DBModel
-	TaxiID		uint
+	TaxiID		uint	// initialised when a taxi is booked for a given route
 	Distance 	int
 	Duration    int
 	Fare        int
@@ -58,5 +58,5 @@ type Booking struct {
 	Taxi           Taxi
 	RiderID        uint
 	Rider          Rider
-	ETA            int // How much time a user has to wait till he gets a taxi.
+	ETA            int 	// How much time a user has to wait till he gets a taxi.
 }
