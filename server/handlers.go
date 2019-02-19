@@ -6,7 +6,6 @@ import (
 	"log"
 	"math/rand"
 	"net/url"
-	"os"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -25,7 +24,7 @@ type RouteInfoStrcut struct {
 	Allpolyline []string
 	Duration    float64
 	Distance    int
-	Price       int
+	Fare        int
 	ETA         int
 }
 
@@ -99,12 +98,27 @@ func getPolyLine(c *gin.Context) {
 	c.JSON(200, allPolyline)
 }
 
+// func confirmBooking(c *gin.Context) {
+// 	// 1) Get the user id, taxi id, route id from context
+// 	q := c.Request.URL.Query()
+// 	userId := q["userid"][0]
+// 	taxiId := q["taxiid"][0]
+// 	routeId := q["routeid"][0]
+// 	fmt.Println(userId, taxiId, routeId)
+// 	// 2) In the database, in Bookings table, store all the values
+
+// 	// 3) Respond to the server saying booking is done, return a string saying "booking done"
+// 	c.String(200, "Booking done")
+// }
+
 // all fuction supporting the API fucntions
 
 func getRoute(obj places) RouteInfoStrcut {
 
-	googleKey := os.Getenv("MAPS_KEY")
-	c, err := maps.NewClient(maps.WithAPIKey(googleKey))
+	// googleKey := os.Getenv("MAPS_KEY")
+	// c, err := maps.NewClient(maps.WithAPIKey(googleKey))
+
+	c, err := maps.NewClient(maps.WithAPIKey("AIzaSyBZgBxptkNs1pSNUsy-QOtCQRimm4JCNDE"))
 
 	if err != nil {
 		log.Fatalf("fatal error: %s", err)
@@ -131,7 +145,7 @@ func getRoute(obj places) RouteInfoStrcut {
 		polyline = maplegs.Steps[i].Polyline.Points
 		allPolyline = append(allPolyline, polyline)
 	}
-	routeInfo := RouteInfoStrcut{Allpolyline: allPolyline, Distance: route[0].Legs[0].Distance.Meters, Duration: route[0].Legs[0].Duration.Minutes(), Price: getfare(route[0].Legs[0].Distance.Meters), ETA: getETA(route[0].Legs[0].Duration.Minutes())}
+	routeInfo := RouteInfoStrcut{Allpolyline: allPolyline, Distance: route[0].Legs[0].Distance.Meters, Duration: route[0].Legs[0].Duration.Minutes(), Fare: getfare(route[0].Legs[0].Distance.Meters), ETA: getETA(route[0].Legs[0].Duration.Minutes())}
 
 	return routeInfo
 
@@ -139,7 +153,7 @@ func getRoute(obj places) RouteInfoStrcut {
 
 func getfare(distance int) int {
 	basePricePerMeter := 3
-	return distance * basePricePerMeter
+	return int(distance/1000) * basePricePerMeter //devided by thousand because distance is in meters
 
 }
 
