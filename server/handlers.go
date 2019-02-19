@@ -91,7 +91,7 @@ func bookingConfirmation(c *gin.Context) {
 	fmt.Println(riderId, taxiId, routeId)
 	// 2) In the database, in Bookings table, store all the values
 	var booking models.Booking
-	db.DB.Create(&booking)
+	//db.DB.Create(&booking)
 
 	booking.RiderID = uint(riderId)
 	booking.TaxiID = uint(taxiId)
@@ -101,8 +101,8 @@ func bookingConfirmation(c *gin.Context) {
 	dbc := getDB(c)
 	dbc.Where("id=?", routeId).Find(&route)
 	fmt.Println("Duration: ", route.Duration)
-	booking.Route.Duration = route.Duration
-	db.DB.Save(&booking)
+	//booking.Route.Duration = route.Duration
+	db.DB.Create(&booking)
 	c.JSON(200, booking)
 
 	// last) Respond to the server saying booking is done, return a string saying "booking done"
