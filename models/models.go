@@ -18,7 +18,7 @@ type DBModel struct {
 
 type Rider struct {
 	DBModel
-	Name string
+	//Name string
 	//InTaxiNum   int // In which taxi user is riding in
 	MaximumWaitingTime int // Time in minutes, later we can try time
 }

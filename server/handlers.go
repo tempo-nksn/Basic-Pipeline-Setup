@@ -3,6 +3,8 @@ package server
 import (
 	"context"
 	"fmt"
+	"github.com/codechrysalis/go.secure-api/constants"
+	"github.com/jinzhu/gorm"
 	"log"
 	"math/rand"
 	"net/url"
@@ -12,6 +14,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/kr/pretty"
 	"github.com/tempo-nksn/Tempo-Backend/models"
+	"github.com/tempo-nksn/Tempo-Backend/db"
 	"googlemaps.github.io/maps"
 )
 
@@ -28,6 +31,11 @@ type RouteInfoStrcut struct {
 	Price       int
 	ETA         int
 }
+
+func getDB(c *gin.Context) *gorm.DB {
+	return c.MustGet(constants.ContextDB).(*gorm.DB)
+}
+
 
 func hello(c *gin.Context) {
 	c.String(200, "Hello User, your taxi is booked")
@@ -155,4 +163,13 @@ func getETA(duration float64) int {
 	} else {
 		return minWaitingTime
 	}
+}
+
+func createRider(c *gin.Context) {
+	var rider models.Rider
+	db := getDB(c)
+	db.DB.Create(&rider)
+
+	c.JSON(200, rider.ID)
+
 }
