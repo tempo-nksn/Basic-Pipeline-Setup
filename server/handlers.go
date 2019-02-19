@@ -278,7 +278,7 @@ func getRide(c *gin.Context) {
 	r := c.Request
 	m, _ := url.ParseQuery(r.URL.RawQuery)
 
-	routeId := m["routeid"][0]
+	routeId,_ := strconv.Atoi(m["routeid"][0])
 	var userRoute models.Route
 	database.Where("id = ?", routeId).Find(&userRoute)
 
