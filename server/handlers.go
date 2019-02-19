@@ -100,8 +100,8 @@ func bookingConfirmation(c *gin.Context) {
 	var route models.Route
 	dbc := getDB(c)
 	dbc.Where("id=?", routeId).Find(&route)
-	fmt.Println("Duration: ", route.Duration)
-	//booking.Route.Duration = route.Duration
+	booking.TravelDuration = route.Duration
+
 	db.DB.Create(&booking)
 	c.JSON(200, booking)
 
@@ -173,6 +173,44 @@ func getRoute(c *gin.Context) {
 	c.JSON(200, fullRoute)
 }
 
+func getDistance(c *gin.Context) {
+
+	// getting  Source and destination
+	request := c.Request
+	m, _ := url.ParseQuery(request.URL.RawQuery)
+	if _, ok := m["src"]; !ok {
+		c.JSON(400, "user source Missing!!!!!")
+		return
+	}
+	if _, ok := m["dest"]; !ok {
+		c.JSON(400, "User destination Missing!!!!!")
+		return
+	}
+	origin := m["src"][0]
+	destination := m["dest"][0]
+
+	//accessing Google map api
+	googleKey := os.Getenv("MAPS_KEY")
+	gmap, err := maps.NewClient(maps.WithAPIKey(googleKey))
+
+	if err != nil {
+		log.Fatalf("fatal error: %s", err)
+	}
+	r := &maps.DirectionsRequest{
+		Origin:      origin,
+		Destination: destination,
+	}
+	r.Mode = maps.TravelModeDriving
+	r.Units = maps.UnitsMetric
+	route, _, err := gmap.Directions(context.Background(), r)
+	if err != nil {
+		log.Fatalf("fatal error: %s", err)
+	}
+
+	c.JSON(200, route[0].Legs[0].Distance.Meters)
+
+}
+
 func getFare(distance int) int {
 	basePricePerMeter := 3
 	return (distance / 1000) * basePricePerMeter
@@ -220,7 +258,7 @@ func bookingDBTest(c *gin.Context) {
 func routeDBTest(c *gin.Context) {
 	db := getDB(c)
 	var route []models.Route
-	db.Find(&route)
+	db.Preload("GooglePath").Find(&route)
 
 	fmt.Println(route)
 	c.JSON(200, route)
