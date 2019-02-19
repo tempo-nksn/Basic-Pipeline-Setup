@@ -103,6 +103,19 @@ func bookingConfirmation(c *gin.Context) {
 	dbc := getDB(c)
 	dbc.Where("id=?", routeId).Find(&route)
 	booking.TravelDuration = route.Duration
+	booking.Status = "To_start"
+	route.Status = "Active"
+	db.DB.Save(&route) // This update the route status to Active
+
+	var taxi models.Taxi
+	dbc.Where("id=?", taxiId).Find(&taxi)
+	// When a cab is free, we assign taxi to a user. If someone is travelling in taxi, then from Active state to Full state is changed.
+	if taxi.Status == "Free" {
+		taxi.Status = "Active"
+	} else if taxi.Status == "Active" {
+		taxi.Status = "Full"
+	}
+	db.DB.Save(&taxi)
 
 	db.DB.Create(&booking)
 	c.JSON(200, booking)
@@ -170,6 +183,7 @@ func getRoute(c *gin.Context) {
 	fullRoute.Fare = getFare(route[0].Legs[0].Distance.Meters)
 	fullRoute.Source = origin
 	fullRoute.Destination = destination
+	fullRoute.Status = "Passive"
 	db.DB.Save(&fullRoute)
 
 	c.JSON(200, fullRoute)
@@ -248,7 +262,7 @@ func createRider(c *gin.Context) {
 	c.JSON(200, rider.ID)
 }
 
-func distPointLine(x float64, y float64, latLng maps.LatLng ) (int) {
+func distPointLine(x float64, y float64, latLng maps.LatLng) int {
 	const PI float64 = 3.141592653589793
 
 	radlat1 := float64(PI * x / 180)
@@ -257,7 +271,7 @@ func distPointLine(x float64, y float64, latLng maps.LatLng ) (int) {
 	theta := float64(y - latLng.Lng)
 	radtheta := float64(PI * theta / 180)
 
-	dist := math.Sin(radlat1) * math.Sin(radlat2) + math.Cos(radlat1) * math.Cos(radlat2) * math.Cos(radtheta)
+	dist := math.Sin(radlat1)*math.Sin(radlat2) + math.Cos(radlat1)*math.Cos(radlat2)*math.Cos(radtheta)
 
 	if dist > 1 {
 		dist = 1
@@ -267,7 +281,7 @@ func distPointLine(x float64, y float64, latLng maps.LatLng ) (int) {
 	dist = dist * 180 / PI
 	dist = dist * 60 * 1.1515
 
-	distInMeter := int(dist*1000)
+	distInMeter := int(dist * 1000)
 
 	return distInMeter
 }
@@ -278,7 +292,7 @@ func getRide(c *gin.Context) {
 	r := c.Request
 	m, _ := url.ParseQuery(r.URL.RawQuery)
 
-	routeId,_ := strconv.Atoi(m["routeid"][0])
+	routeId, _ := strconv.Atoi(m["routeid"][0])
 	var userRoute models.Route
 	database.Where("id = ?", routeId).Preload("GooglePath").Find(&userRoute)
 
@@ -299,16 +313,16 @@ func getRide(c *gin.Context) {
 
 	for _, googlePath := range userRoute.GooglePath {
 		var latLang []maps.LatLng
-		latLang, _ =  maps.DecodePolyline(googlePath.Path)
+		latLang, _ = maps.DecodePolyline(googlePath.Path)
 		userRouteLatLang = append(userRouteLatLang, latLang...)
 	}
 
 	var taxis []models.Taxi
 	var route models.Route
 
-	const statusActive  = "Active"
+	const statusActive = "Active"
 	const statusFree = "Free"
-	const maxDistance  = 10 // Maximum distance of the user from a existing path for him/her to share a ride on that path
+	const maxDistance = 10 // Maximum distance of the user from a existing path for him/her to share a ride on that path
 
 	var isSrcInRoute bool
 	database.Where("status = ?", statusActive).Find(&taxis)
