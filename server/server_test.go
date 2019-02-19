@@ -2,6 +2,7 @@ package server
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/jinzhu/gorm"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
@@ -18,12 +19,18 @@ func performRequest(r http.Handler, method, path string) *httptest.ResponseRecor
 
 var _ = Describe("Server", func() {
 	var (
+		db_test  *gorm.DB
 		router   *gin.Engine
 		response *httptest.ResponseRecorder
 	)
 
 	BeforeEach(func() {
-		router = CreateRouter()
+		d, err := gorm.Open("postgres", "postgres://fpfujvlpxoelcm:93ec17a8d9323c29e05b569ea2bd77fa2d7dc96564d2f5b6eaa521807bf8b787@ec2-54-243-128-95.compute-1.amazonaws.com:5432/d34p830c249n99")
+		db_test = d
+		if err != nil {
+			panic(err)
+		}
+		router = CreateRouter(db_test)
 	})
 
 	Describe("Version 1 API at /api/v1", func() {
