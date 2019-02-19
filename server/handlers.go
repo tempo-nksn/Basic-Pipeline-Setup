@@ -82,6 +82,33 @@ func getNearByTaxis(c *gin.Context) {
 
 }
 
+func bookingConfirmation(c *gin.Context) {
+	// 1) Get the user id, taxi id, route id from context
+	q := c.Request.URL.Query()
+	riderId, _ := strconv.Atoi(q["riderid"][0])
+	taxiId, _ := strconv.Atoi(q["taxiid"][0])
+	routeId, _ := strconv.Atoi(q["routeid"][0])
+	fmt.Println(riderId, taxiId, routeId)
+	// 2) In the database, in Bookings table, store all the values
+	var booking models.Booking
+	db.DB.Create(&booking)
+
+	booking.RiderID = uint(riderId)
+	booking.TaxiID = uint(taxiId)
+	booking.RouteID = uint(routeId)
+	// 3) Get the duration, based on Routeid
+	var route models.Route
+	dbc := getDB(c)
+	dbc.Where("id=?", routeId).Find(&route)
+	fmt.Println("Duration: ", route.Duration)
+	booking.Route.Duration = route.Duration
+	db.DB.Save(&booking)
+	c.JSON(200, booking)
+
+	// last) Respond to the server saying booking is done, return a string saying "booking done"
+	//c.String(200, "Booking done")
+}
+
 // all fuction supporting the API fucntions
 func getRoute(c *gin.Context) {
 
@@ -179,4 +206,13 @@ func createRider(c *gin.Context) {
 	db.DB.Create(&rider)
 
 	c.JSON(200, rider.ID)
+}
+
+func bookingDBTest(c *gin.Context) {
+	db := getDB(c)
+	var bookings []models.Booking
+	db.Find(&bookings)
+
+	fmt.Println(bookings)
+	c.JSON(200, bookings)
 }
