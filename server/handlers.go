@@ -280,7 +280,7 @@ func getRide(c *gin.Context) {
 
 	routeId,_ := strconv.Atoi(m["routeid"][0])
 	var userRoute models.Route
-	database.Where("id = ?", routeId).Find(&userRoute)
+	database.Where("id = ?", routeId).Preload("GooglePath").Find(&userRoute)
 
 	userSrc := strings.Split(userRoute.Source, ",")
 	userDest := strings.Split(userRoute.Destination, ",")
@@ -310,70 +310,77 @@ func getRide(c *gin.Context) {
 	const statusFree = "Free"
 	const maxDistance  = 10 // Maximum distance of the user from a existing path for him/her to share a ride on that path
 
-	database.Where("status = ?", statusActive).Find(&taxis)
 	var isSrcInRoute bool
+	database.Where("status = ?", statusActive).Find(&taxis)
 
-	// FInd if any existing active taxi can be shared
-	for _, taxi := range taxis {
+	if len(taxis) > 0 {
+		// FInd if any existing active taxi can be shared
+		for _, taxi := range taxis {
 
-		database.Where("taxi_id = ? and status = ?", taxi.ID, statusActive).Find(&route)
-		routeDest := strings.Split(route.Destination, ",")
-		var routeDestLat float64
-		var routeDestLng float64
+			database.Where("taxi_id = ? and status = ?", taxi.ID, statusActive).Preload("GooglePath").Find(&route)
 
-		routeDestLat, _ = strconv.ParseFloat(routeDest[0], 64)
-		routeDestLng, _ = strconv.ParseFloat(routeDest[1], 64)
-
-		var allLatLang []maps.LatLng
-
-		for _, googlePath := range route.GooglePath {
-			var latLang []maps.LatLng
-			latLang, _ =  maps.DecodePolyline(googlePath.Path)
-			allLatLang = append(allLatLang, latLang...)
-		}
-
-		// Check iof the userSrc lies near the route
-		isSrcInRoute = false
-		for idx:=0; idx<len(allLatLang); idx++ {
-			if distPointLine(userSrcLat, userSrcLng, allLatLang[idx]) < maxDistance {
-				isSrcInRoute = true
-				break
+			if route.ID == 0 {
+				continue
 			}
-		}
 
-		// if the source is not near the route then check the next Taxi
-		if !isSrcInRoute {
-			continue
-		}
+			routeDest := strings.Split(route.Destination, ",")
+			var routeDestLat float64
+			var routeDestLng float64
 
-		// If the source matches then check whether on eof the destination lies near the route of the other
-		var isUserDestInRoute bool
-		for idx:=0; idx<len(allLatLang); idx++ {
-			if distPointLine(userDestLat, userDestLng, allLatLang[idx]) < maxDistance {
-				isUserDestInRoute = true
-				break
+			routeDestLat, _ = strconv.ParseFloat(routeDest[0], 64)
+			routeDestLng, _ = strconv.ParseFloat(routeDest[1], 64)
+
+			var allLatLang []maps.LatLng
+
+			for _, googlePath := range route.GooglePath {
+				var latLang []maps.LatLng
+				latLang, _ = maps.DecodePolyline(googlePath.Path)
+				allLatLang = append(allLatLang, latLang...)
 			}
-		}
 
-		if isUserDestInRoute {
-			// Return the taxi id
-			c.JSON(200, taxi.ID)
-			return
-		}
-
-		// check if the taxi destination lies in userRoute
-		var isRouteDestInUserRoute bool
-		for idx:=0; idx<len(userRouteLatLang); idx++ {
-			if distPointLine(routeDestLat, routeDestLng, userRouteLatLang[idx]) < maxDistance {
-				isRouteDestInUserRoute = true
-				break
+			// Check iof the userSrc lies near the route
+			isSrcInRoute = false
+			for idx := 0; idx < len(allLatLang); idx++ {
+				if distPointLine(userSrcLat, userSrcLng, allLatLang[idx]) < maxDistance {
+					isSrcInRoute = true
+					break
+				}
 			}
-		}
 
-		if isRouteDestInUserRoute {
-			// Return the taxi id
-			c.JSON(200, taxi.ID)
-			return
+			// if the source is not near the route then check the next Taxi
+			if !isSrcInRoute {
+				continue
+			}
+
+			// If the source matches then check whether on eof the destination lies near the route of the other
+			var isUserDestInRoute bool
+			for idx := 0; idx < len(allLatLang); idx++ {
+				if distPointLine(userDestLat, userDestLng, allLatLang[idx]) < maxDistance {
+					isUserDestInRoute = true
+					break
+				}
+			}
+
+			if isUserDestInRoute {
+				// Return the taxi id
+				c.JSON(200, taxi.ID)
+				return
+			}
+
+			// check if the taxi destination lies in userRoute
+			var isRouteDestInUserRoute bool
+			for idx := 0; idx < len(userRouteLatLang); idx++ {
+				if distPointLine(routeDestLat, routeDestLng, userRouteLatLang[idx]) < maxDistance {
+					isRouteDestInUserRoute = true
+					break
+				}
+			}
+
+			if isRouteDestInUserRoute {
+				// Return the taxi id
+				c.JSON(200, taxi.ID)
+				return
+			}
 		}
 	}
 
