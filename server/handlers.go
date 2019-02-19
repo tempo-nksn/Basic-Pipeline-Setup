@@ -4,10 +4,12 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"math"
 	"math/rand"
 	"net/url"
 	"os"
 	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
@@ -244,6 +246,147 @@ func createRider(c *gin.Context) {
 	db.DB.Create(&rider)
 
 	c.JSON(200, rider.ID)
+}
+
+func distPointLine(x float64, y float64, latLng maps.LatLng ) (int) {
+	const PI float64 = 3.141592653589793
+
+	radlat1 := float64(PI * x / 180)
+	radlat2 := float64(PI * latLng.Lat / 180)
+
+	theta := float64(y - latLng.Lng)
+	radtheta := float64(PI * theta / 180)
+
+	dist := math.Sin(radlat1) * math.Sin(radlat2) + math.Cos(radlat1) * math.Cos(radlat2) * math.Cos(radtheta)
+
+	if dist > 1 {
+		dist = 1
+	}
+
+	dist = math.Acos(dist)
+	dist = dist * 180 / PI
+	dist = dist * 60 * 1.1515
+
+	distInMeter := int(dist*1000)
+
+	return distInMeter
+}
+
+func getRide(c *gin.Context) {
+	database := getDB(c)
+
+	r := c.Request
+	m, _ := url.ParseQuery(r.URL.RawQuery)
+
+	routeId := m["routeid"][0]
+	var userRoute models.Route
+	database.Where("id = ?", routeId).Find(&userRoute)
+
+	userSrc := strings.Split(userRoute.Source, ",")
+	userDest := strings.Split(userRoute.Destination, ",")
+
+	var userSrcLat float64
+	var userSrcLng float64
+	var userDestLat float64
+	var userDestLng float64
+
+	userSrcLat, _ = strconv.ParseFloat(userSrc[0], 64)
+	userSrcLng, _ = strconv.ParseFloat(userSrc[1], 64)
+	userDestLat, _ = strconv.ParseFloat(userDest[0], 64)
+	userDestLng, _ = strconv.ParseFloat(userDest[1], 64)
+
+	var userRouteLatLang []maps.LatLng
+
+	for _, googlePath := range userRoute.GooglePath {
+		var latLang []maps.LatLng
+		latLang, _ =  maps.DecodePolyline(googlePath.Path)
+		userRouteLatLang = append(userRouteLatLang, latLang...)
+	}
+
+	var taxis []models.Taxi
+	var route models.Route
+
+	const statusActive  = "Active"
+	const statusFree = "Free"
+	const maxDistance  = 10 // Maximum distance of the user from a existing path for him/her to share a ride on that path
+
+	database.Where("status = ?", statusActive).Find(&taxis)
+	var isSrcInRoute bool
+
+	// FInd if any existing active taxi can be shared
+	for _, taxi := range taxis {
+
+		database.Where("taxi_id = ? and status = ?", taxi.ID, statusActive).Find(&route)
+		routeDest := strings.Split(route.Destination, ",")
+		var routeDestLat float64
+		var routeDestLng float64
+
+		routeDestLat, _ = strconv.ParseFloat(routeDest[0], 64)
+		routeDestLng, _ = strconv.ParseFloat(routeDest[1], 64)
+
+		var allLatLang []maps.LatLng
+
+		for _, googlePath := range route.GooglePath {
+			var latLang []maps.LatLng
+			latLang, _ =  maps.DecodePolyline(googlePath.Path)
+			allLatLang = append(allLatLang, latLang...)
+		}
+
+		// Check iof the userSrc lies near the route
+		isSrcInRoute = false
+		for idx:=0; idx<len(allLatLang); idx++ {
+			if distPointLine(userSrcLat, userSrcLng, allLatLang[idx]) < maxDistance {
+				isSrcInRoute = true
+				break
+			}
+		}
+
+		// if the source is not near the route then check the next Taxi
+		if !isSrcInRoute {
+			continue
+		}
+
+		// If the source matches then check whether on eof the destination lies near the route of the other
+		var isUserDestInRoute bool
+		for idx:=0; idx<len(allLatLang); idx++ {
+			if distPointLine(userDestLat, userDestLng, allLatLang[idx]) < maxDistance {
+				isUserDestInRoute = true
+				break
+			}
+		}
+
+		if isUserDestInRoute {
+			// Return the taxi id
+			c.JSON(200, taxi.ID)
+			return
+		}
+
+		// check if the taxi destination lies in userRoute
+		var isRouteDestInUserRoute bool
+		for idx:=0; idx<len(userRouteLatLang); idx++ {
+			if distPointLine(routeDestLat, routeDestLng, userRouteLatLang[idx]) < maxDistance {
+				isRouteDestInUserRoute = true
+				break
+			}
+		}
+
+		if isRouteDestInUserRoute {
+			// Return the taxi id
+			c.JSON(200, taxi.ID)
+			return
+		}
+	}
+
+	// Give user the free taxi
+	var taxi models.Taxi
+	database.Where("status = ?", statusFree).First(&taxi)
+	if taxi.NumberPlate != "" {
+		c.JSON(200, taxi.ID)
+		return
+	}
+
+	// No taxi Available
+	c.JSON(400, "No Taxi available in the system")
 }
 
 func bookingDBTest(c *gin.Context) {
