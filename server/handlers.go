@@ -173,23 +173,10 @@ func getRoute(c *gin.Context) {
 	c.JSON(200, fullRoute)
 }
 
-func getDistance(c *gin.Context) {
+func getDistance(origin string, destination string) int {
 
 	// getting  Source and destination
-	request := c.Request
-	m, _ := url.ParseQuery(request.URL.RawQuery)
-	if _, ok := m["src"]; !ok {
-		c.JSON(400, "user source Missing!!!!!")
-		return
-	}
-	if _, ok := m["dest"]; !ok {
-		c.JSON(400, "User destination Missing!!!!!")
-		return
-	}
-	origin := m["src"][0]
-	destination := m["dest"][0]
 
-	//accessing Google map api
 	googleKey := os.Getenv("MAPS_KEY")
 	gmap, err := maps.NewClient(maps.WithAPIKey(googleKey))
 
@@ -207,7 +194,9 @@ func getDistance(c *gin.Context) {
 		log.Fatalf("fatal error: %s", err)
 	}
 
-	c.JSON(200, route[0].Legs[0].Distance.Meters)
+	//c.JSON(200, route[0].Legs[0].Distance.Meters)
+
+	return route[0].Legs[0].Distance.Meters
 
 }
 
