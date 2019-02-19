@@ -3,8 +3,6 @@ package server
 import (
 	"context"
 	"fmt"
-	"github.com/codechrysalis/go.secure-api/constants"
-	"github.com/jinzhu/gorm"
 	"log"
 	"math/rand"
 	"net/url"
@@ -12,9 +10,11 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/jinzhu/gorm"
 	"github.com/kr/pretty"
-	"github.com/tempo-nksn/Tempo-Backend/models"
+	"github.com/tempo-nksn/Tempo-Backend/constants"
 	"github.com/tempo-nksn/Tempo-Backend/db"
+	"github.com/tempo-nksn/Tempo-Backend/models"
 	"googlemaps.github.io/maps"
 )
 
