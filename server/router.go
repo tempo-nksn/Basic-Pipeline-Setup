@@ -11,5 +11,6 @@ func setupRoutes(router *gin.Engine) {
 	v1.GET("/nearbytaxis/", getNearByTaxis)
 	v1.GET("/getRoute", getRoute)
 	v1.GET("/taxis/", testFromDB)
+	v1.GET("/userid", createRider)
 
 }
