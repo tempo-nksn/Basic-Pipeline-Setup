@@ -20,6 +20,15 @@ type places struct {
 	destination string
 }
 
+// RouteInfoStrcut is for getting all information between source and destination
+type RouteInfoStrcut struct {
+	Allpolyline []string
+	Duration    float64
+	Distance    int
+	Price       int
+	ETA         int
+}
+
 func hello(c *gin.Context) {
 	c.String(200, "Hello User, your taxi is booked")
 }
@@ -90,9 +99,13 @@ func getPolyLine(c *gin.Context) {
 	c.JSON(200, allPolyline)
 }
 
-func getRoute(obj places) []string {
+// all fuction supporting the API fucntions
+
+func getRoute(obj places) RouteInfoStrcut {
+
 	googleKey := os.Getenv("MAPS_KEY")
 	c, err := maps.NewClient(maps.WithAPIKey(googleKey))
+
 	if err != nil {
 		log.Fatalf("fatal error: %s", err)
 	}
@@ -118,6 +131,28 @@ func getRoute(obj places) []string {
 		polyline = maplegs.Steps[i].Polyline.Points
 		allPolyline = append(allPolyline, polyline)
 	}
-	return allPolyline
+	routeInfo := RouteInfoStrcut{Allpolyline: allPolyline, Distance: route[0].Legs[0].Distance.Meters, Duration: route[0].Legs[0].Duration.Minutes(), Price: getfare(route[0].Legs[0].Distance.Meters), ETA: getETA(route[0].Legs[0].Duration.Minutes())}
 
+	return routeInfo
+
+}
+
+func getfare(distance int) int {
+	basePricePerMeter := 3
+	return distance * basePricePerMeter
+
+}
+
+func getETA(duration float64) int {
+	minWaitingTime, maxWaitingTime := 5, 15
+
+	waitingTime := int(0.05 * duration)
+	if (waitingTime < maxWaitingTime) && (waitingTime > minWaitingTime) {
+		return waitingTime
+	} else if waitingTime > maxWaitingTime {
+		return maxWaitingTime
+
+	} else {
+		return minWaitingTime
+	}
 }
