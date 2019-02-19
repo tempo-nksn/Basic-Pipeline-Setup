@@ -105,6 +105,7 @@ func bookingConfirmation(c *gin.Context) {
 	booking.TravelDuration = route.Duration
 	booking.Status = "To_start"
 	route.Status = "Active"
+	route.TaxiID = uint(taxiId)
 	db.DB.Save(&route) // This update the route status to Active
 
 	var taxi models.Taxi
