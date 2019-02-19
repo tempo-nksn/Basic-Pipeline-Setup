@@ -41,6 +41,7 @@ type GooglePath struct {
 
 type Route struct {
 	DBModel
+	TaxiID		uint
 	Distance 	int
 	Duration    int
 	Fare        int
