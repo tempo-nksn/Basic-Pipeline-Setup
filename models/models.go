@@ -48,6 +48,7 @@ type Route struct {
 	GooglePath  []GooglePath
 	Source      string
 	Destination string
+	Status 		string	// can be Active or Passive
 }
 
 type Booking struct {
@@ -58,5 +59,6 @@ type Booking struct {
 	Taxi           Taxi
 	RiderID        uint
 	Rider          Rider
-	ETA            int 	// How much time a user has to wait till he gets a taxi.
+	ETA            int 		// How much time a user has to wait till he gets a taxi.
+	Status		   string	// Can be To_start, Active or Finished
 }
