@@ -84,6 +84,33 @@ func getNearByTaxis(c *gin.Context) {
 
 }
 
+func bookingConfirmation(c *gin.Context) {
+	// 1) Get the user id, taxi id, route id from context
+	q := c.Request.URL.Query()
+	riderId, _ := strconv.Atoi(q["riderid"][0])
+	taxiId, _ := strconv.Atoi(q["taxiid"][0])
+	routeId, _ := strconv.Atoi(q["routeid"][0])
+	fmt.Println(riderId, taxiId, routeId)
+	// 2) In the database, in Bookings table, store all the values
+	var booking models.Booking
+	//db.DB.Create(&booking)
+
+	booking.RiderID = uint(riderId)
+	booking.TaxiID = uint(taxiId)
+	booking.RouteID = uint(routeId)
+	// 3) Get the duration, based on Routeid
+	var route models.Route
+	dbc := getDB(c)
+	dbc.Where("id=?", routeId).Find(&route)
+	booking.TravelDuration = route.Duration
+
+	db.DB.Create(&booking)
+	c.JSON(200, booking)
+
+	// last) Respond to the server saying booking is done, return a string saying "booking done"
+	//c.String(200, "Booking done")
+}
+
 // all fuction supporting the API fucntions
 func getRoute(c *gin.Context) {
 
@@ -146,6 +173,44 @@ func getRoute(c *gin.Context) {
 	db.DB.Save(&fullRoute)
 
 	c.JSON(200, fullRoute)
+}
+
+func getDistance(c *gin.Context) {
+
+	// getting  Source and destination
+	request := c.Request
+	m, _ := url.ParseQuery(request.URL.RawQuery)
+	if _, ok := m["src"]; !ok {
+		c.JSON(400, "user source Missing!!!!!")
+		return
+	}
+	if _, ok := m["dest"]; !ok {
+		c.JSON(400, "User destination Missing!!!!!")
+		return
+	}
+	origin := m["src"][0]
+	destination := m["dest"][0]
+
+	//accessing Google map api
+	googleKey := os.Getenv("MAPS_KEY")
+	gmap, err := maps.NewClient(maps.WithAPIKey(googleKey))
+
+	if err != nil {
+		log.Fatalf("fatal error: %s", err)
+	}
+	r := &maps.DirectionsRequest{
+		Origin:      origin,
+		Destination: destination,
+	}
+	r.Mode = maps.TravelModeDriving
+	r.Units = maps.UnitsMetric
+	route, _, err := gmap.Directions(context.Background(), r)
+	if err != nil {
+		log.Fatalf("fatal error: %s", err)
+	}
+
+	c.JSON(200, route[0].Legs[0].Distance.Meters)
+
 }
 
 func getFare(distance int) int {
@@ -322,5 +387,22 @@ func getRide(c *gin.Context) {
 
 	// No taxi Available
 	c.JSON(400, "No Taxi available in the system")
+}
 
+func bookingDBTest(c *gin.Context) {
+	db := getDB(c)
+	var bookings []models.Booking
+	db.Find(&bookings)
+
+	fmt.Println(bookings)
+	c.JSON(200, bookings)
+}
+
+func routeDBTest(c *gin.Context) {
+	db := getDB(c)
+	var route []models.Route
+	db.Preload("GooglePath").Find(&route)
+
+	fmt.Println(route)
+	c.JSON(200, route)
 }
