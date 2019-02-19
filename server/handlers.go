@@ -125,6 +125,19 @@ func bookingConfirmation(c *gin.Context) {
 	//c.String(200, "Booking done")
 }
 
+func startRide(c *gin.Context) {
+	dbc := getDB(c)
+	q := c.Request.URL.Query()
+	bookingId, _ := strconv.Atoi(q["bookingId"][0])
+	var booking models.Booking
+
+	dbc.Where("id=?", bookingId).Find(&booking)
+	booking.Status = "Start"
+	db.DB.Save(&booking)
+
+	c.JSON(200, "Ride Starting")
+}
+
 // all fuction supporting the API fucntions
 func getRoute(c *gin.Context) {
 
