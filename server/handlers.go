@@ -319,7 +319,6 @@ func getRide(c *gin.Context) {
 	}
 
 	var taxis []models.Taxi
-	var route models.Route
 
 	const statusActive = "Active"
 	const statusFree = "Free"
@@ -328,13 +327,17 @@ func getRide(c *gin.Context) {
 	var isSrcInRoute bool
 	database.Where("status = ?", statusActive).Find(&taxis)
 
+	fmt.Println("TOtal number of Active taxi are", len(taxis))
+
 	if len(taxis) > 0 {
 		// FInd if any existing active taxi can be shared
 		for _, taxi := range taxis {
 
+			var route models.Route
 			database.Where("taxi_id = ? and status = ?", taxi.ID, statusActive).Preload("GooglePath").Find(&route)
 
-			if route.ID == 0 {
+			if route.ID < 1 {
+				fmt.Println("No Active route found for taxi_id %d", taxi.ID)
 				continue
 			}
 
@@ -357,6 +360,7 @@ func getRide(c *gin.Context) {
 			isSrcInRoute = false
 			for idx := 0; idx < len(allLatLang); idx++ {
 				if distPointLine(userSrcLat, userSrcLng, allLatLang[idx]) < maxDistance {
+					fmt.Println("Distance of source idx ",idx, "   ", distPointLine(userSrcLat, userSrcLng, allLatLang[idx]))
 					isSrcInRoute = true
 					break
 				}
@@ -368,9 +372,10 @@ func getRide(c *gin.Context) {
 			}
 
 			// If the source matches then check whether on eof the destination lies near the route of the other
-			var isUserDestInRoute bool
+			isUserDestInRoute := false
 			for idx := 0; idx < len(allLatLang); idx++ {
 				if distPointLine(userDestLat, userDestLng, allLatLang[idx]) < maxDistance {
+					fmt.Println("Distance of Destination idx ", idx, "      ", distPointLine(userDestLat, userDestLng, allLatLang[idx]))
 					isUserDestInRoute = true
 					break
 				}
@@ -386,6 +391,7 @@ func getRide(c *gin.Context) {
 			var isRouteDestInUserRoute bool
 			for idx := 0; idx < len(userRouteLatLang); idx++ {
 				if distPointLine(routeDestLat, routeDestLng, userRouteLatLang[idx]) < maxDistance {
+					fmt.Println(distPointLine(routeDestLat, routeDestLng, userRouteLatLang[idx]))
 					isRouteDestInUserRoute = true
 					break
 				}
@@ -397,6 +403,8 @@ func getRide(c *gin.Context) {
 				return
 			}
 		}
+
+		fmt.Println("Couldnot FIND and ACTIVE Taxi")
 	}
 
 	// Give user the free taxi
