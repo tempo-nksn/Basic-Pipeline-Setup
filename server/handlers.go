@@ -138,6 +138,33 @@ func startRide(c *gin.Context) {
 	c.JSON(200, "Ride Starting")
 }
 
+
+func finishRide(c *gin.Context) {
+	dbc := getDB(c)
+	q := c.Request.URL.Query()
+	bookingId, _ := strconv.Atoi(q["bookingId"][0])
+	var booking models.Booking
+	var route models.Route
+	var taxi models.Taxi
+
+	dbc.Where("id=?", bookingId).Find(&booking)
+	dbc.Where("id=?", booking.RouteID).Find(&route)
+	dbc.Where("id=?", booking.TaxiID).Find(&taxi)
+
+	route.Status = "Passive"
+	if taxi.Status=="Active" {
+		taxi.Status = "Free"
+	} else if taxi.Status == "Full" {
+		taxi.Status = "Active"
+	}
+	booking.Status = "Finished"
+	db.DB.Save(&booking)
+	db.DB.Save(&route)
+	db.DB.Save(&taxi)
+
+	c.JSON(200, "Ride Finished")
+}
+
 // all fuction supporting the API fucntions
 func getRoute(c *gin.Context) {
 
