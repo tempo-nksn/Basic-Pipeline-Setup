@@ -18,9 +18,7 @@ type DBModel struct {
 
 type Rider struct {
 	DBModel
-	Name        string
-	Source      string
-	Destination string
+	Name string
 	//InTaxiNum   int // In which taxi user is riding in
 	MaximumWaitingTime int // Time in minutes, later we can try time
 }
@@ -43,9 +41,11 @@ type GooglePath struct {
 
 type Route struct {
 	DBModel
+	Duration    int
+	Fare        int
+	GooglePath  []GooglePath
 	Source      string
 	Destination string
-	GooglePath  []GooglePath
 }
 
 type Booking struct {
@@ -56,7 +56,5 @@ type Booking struct {
 	Taxi           Taxi
 	RiderID        uint
 	Rider          Rider
-	Price          int
-	TravelDuration int // To say how much time it takes to complete the trip
 	ETA            int // How much time a user has to wait till he gets a taxi.
 }
