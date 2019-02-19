@@ -1,13 +1,14 @@
 package server
 
 import (
-	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
-
 	"net/http"
 	"net/http/httptest"
+
+	"github.com/gin-gonic/gin"
+	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/postgres"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
 func performRequest(r http.Handler, method, path string) *httptest.ResponseRecorder {
