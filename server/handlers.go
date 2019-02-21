@@ -33,6 +33,10 @@ func getDB(c *gin.Context) *gorm.DB {
 	return c.MustGet(constants.ContextDB).(*gorm.DB)
 }
 
+func hello(c *gin.Context) {
+	c.String(200, "Hello User, your taxi is booked")
+}
+
 func UserRegistration(c *gin.Context) {
 	db := getDB(c)
 	var newuser models.Rider
