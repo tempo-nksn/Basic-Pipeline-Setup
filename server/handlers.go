@@ -138,7 +138,6 @@ func startRide(c *gin.Context) {
 	c.JSON(200, "Ride Starting")
 }
 
-
 func finishRide(c *gin.Context) {
 	dbc := getDB(c)
 	q := c.Request.URL.Query()
@@ -152,7 +151,7 @@ func finishRide(c *gin.Context) {
 	dbc.Where("id=?", booking.TaxiID).Find(&taxi)
 
 	route.Status = "Passive"
-	if taxi.Status=="Active" {
+	if taxi.Status == "Active" {
 		taxi.Status = "Free"
 	} else if taxi.Status == "Full" {
 		taxi.Status = "Active"
