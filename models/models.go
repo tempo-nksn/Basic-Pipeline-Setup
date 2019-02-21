@@ -18,9 +18,11 @@ type DBModel struct {
 
 type Rider struct {
 	DBModel
-	Name string
-	//InTaxiNum   int // In which taxi user is riding in
-	MaximumWaitingTime int // Time in minutes, later we can try time
+	Name     string
+	UName    string `gorm:"type:varchar(40); not null`
+	Password string `gorm:"type:varchar(40); not null`
+	Email    string
+	PhoneNo  string
 }
 
 type Taxi struct {
