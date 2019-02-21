@@ -1,5 +1,7 @@
 module github.com/tempo-nksn/Tempo-Backend
 
+// +heroku install . ./cmd/...
+
 require (
 	github.com/gin-contrib/sse v0.0.0-20190125020943-a7658810eb74 // indirect
 	github.com/gin-gonic/gin v1.3.0

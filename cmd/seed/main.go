@@ -36,9 +36,10 @@ func main() {
 	}
 	defer database.Close()
 	db.Init(database)
-
+	db.DB.Unscoped().Delete(&taxis)
+	// db.DB.Delete(&taxis)
 	for _, taxi := range taxis {
-		db.DB.Save(&taxi)
+		db.DB.Create(&taxi)
 	}
 
 }
