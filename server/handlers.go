@@ -138,7 +138,6 @@ func startRide(c *gin.Context) {
 	c.JSON(200, "Ride Starting")
 }
 
-
 func finishRide(c *gin.Context) {
 	dbc := getDB(c)
 	q := c.Request.URL.Query()

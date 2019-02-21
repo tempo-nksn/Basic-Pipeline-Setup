@@ -23,4 +23,5 @@ func main() {
 	// Creating a router
 	router := server.CreateRouter(database)
 	server.StartServer(router)
+
 }
