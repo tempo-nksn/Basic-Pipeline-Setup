@@ -17,7 +17,9 @@ import (
 
 func main() {
 	var taxis []models.Taxi
+	var riders []models.Rider
 	getData("data/taxis.json", &taxis)
+	getData("data/riders.json",&riders)
 
 	DATABASE := os.Getenv("DB_DRIVER")
 	databaseURL := os.Getenv("DATABASE_URL")
@@ -41,7 +43,10 @@ func main() {
 	for _, taxi := range taxis {
 		db.DB.Create(&taxi)
 	}
-
+	for _, rider:=range riders{
+		db.DB.Create(&rider)
+	}
+	log.Println("Seed data created!! Now you move it!")
 }
 
 func getData(fileName string, v interface{}) {

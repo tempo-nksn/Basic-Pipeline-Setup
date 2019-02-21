@@ -33,17 +33,18 @@ func getDB(c *gin.Context) *gorm.DB {
 	return c.MustGet(constants.ContextDB).(*gorm.DB)
 }
 
-func hello(c *gin.Context) {
-	c.String(200, "Hello User, your taxi is booked")
-}
-
-func dummyPost(c *gin.Context) {
-	var str struct {
-		Name string `json:"name"`
+func UserRegistration(c *gin.Context) {
+	db := getDB(c)
+	var newuser models.Rider
+	var checkUser models.Rider
+	c.BindJSON(&newuser)
+	db.Where("u_name = ?", newuser.UName).First(&checkUser)
+	if checkUser.UName != "" {
+		c.JSON(409, "User Already Exists")
+	} else {
+		db.Create(&newuser)
+		c.JSON(201, "User added successfully!")
 	}
-	c.BindJSON(&str)
-	fmt.Printf("I am posting to ios")
-	c.JSON(200, str)
 }
 
 // getNearByTaxis calculates 3 random taxi location neat the user
