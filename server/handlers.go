@@ -111,19 +111,30 @@ func bookingConfirmation(c *gin.Context) {
 	booking.Status = "To_start"
 	route.Status = "Active"
 	route.TaxiID = uint(taxiId)
-	db.DB.Save(&route) // This update the route status to Active
+	dbc.Save(&route) // This update the route status to Active
 
 	var taxi models.Taxi
 	dbc.Where("id=?", taxiId).Find(&taxi)
 	// When a cab is free, we assign taxi to a user. If someone is travelling in taxi, then from Active state to Full state is changed.
 	if taxi.Status == "Free" {
+		fmt.Println("ACTIVE")
 		taxi.Status = "Active"
 	} else if taxi.Status == "Active" {
 		taxi.Status = "Full"
+		fmt.Println("FULL")
 	}
-	db.DB.Save(&taxi)
-
-	db.DB.Create(&booking)
+	dbc.Save(&taxi)
+	var rider models.Rider
+	fmt.Println(riderId)
+	dbc.Where("id = ?", riderId).Find(&rider)
+	fmt.Println(rider)
+	var fail, failmsg = paymentHandler(route.Fare, rider.Email)
+	if fail == false {
+		log.Print(failmsg)
+		c.JSON(401, failmsg)
+		return
+	}
+	dbc.Create(&booking)
 	c.JSON(200, booking)
 
 	// last) Respond to the server saying booking is done, return a string saying "booking done"
