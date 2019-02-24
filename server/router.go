@@ -33,4 +33,7 @@ func setupRoutes(router *gin.Engine) {
 	v1.GET("/routeDBTest", routeDBTest)
 	v1.GET("/getDistance", getDistance)
 	v1.GET("/taxis", testFromDB)
+	dash := v1.Group("/dashboard")
+	dash.Use(authMiddleware.LoginHandler)
+	dash.GET("/", getUserDash)
 }

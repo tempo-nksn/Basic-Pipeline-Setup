@@ -19,9 +19,11 @@ func main() {
 	var taxis []models.Taxi
 	var riders []models.Rider
 	var drivers []models.Driver
+  var routes []models.Route
 	getData("data/taxis.json", &taxis)
 	getData("data/riders.json", &riders)
 	getData("data/drivers.json", &drivers)
+	getData("data/routes.json", &routes)
 
 	DATABASE := os.Getenv("DB_DRIVER")
 	databaseURL := os.Getenv("DATABASE_URL")
@@ -50,6 +52,9 @@ func main() {
 	}
 	for _, driver := range drivers {
 		db.DB.Create(&driver)
+  }
+	for _, route := range routes {
+		db.DB.Create(&route)
 	}
 	log.Println("Seed data created!! Now you move it!")
 }
