@@ -18,6 +18,7 @@ import (
 	"github.com/tempo-nksn/Tempo-Backend/db"
 	"github.com/tempo-nksn/Tempo-Backend/models"
 	"googlemaps.github.io/maps"
+	jwt "github.com/appleboy/gin-jwt"
 )
 
 // RouteInfoStrcut is for getting all information between source and destination
@@ -482,4 +483,16 @@ func routeDBTest(c *gin.Context) {
 
 	fmt.Println(route)
 	c.JSON(200, route)
+}
+
+func getUserDash(c *gin.Context) {
+	db := getDB(c)
+	claims := jwt.ExtractClaims(c)
+	id := claims["id"]
+
+	var rider models.Rider
+	db.Where("user_id = ?", id).First(&rider)
+	var dash = models.DashBoard{ Name : rider.UName, Email : rider.Email,
+								 Phone: rider.PhoneNo, Wallet: rider.Wallet }
+	c.JSON(200, dash)
 }
