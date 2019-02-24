@@ -3,25 +3,9 @@ package server
 import "github.com/gin-gonic/gin"
 
 func setupRoutes(router *gin.Engine) {
-	//for local
-	//path:= "templates/*"
-	//for circleci
-	path:="/go/src/github.com/tempo-nksn/Tempo-Backend/templates/*"
-	router.LoadHTMLGlob(path)
 	authMiddleware := JWT()
 	router.POST("/login", authMiddleware.LoginHandler)
-	router.POST("/signup", userRegistration)
-	router.GET("/templatetest", templateTest)
-	driver:=router.Group("/driver")
-	{
-		driver.GET("/", driverIntro)
-		driver.GET("/registration", driverReg)
-		driver.POST("/registering", registering)
-		driver.GET("/login", driverLogin)
-		driver.POST("/dashboard", driverDash)
-	}
-
-
+	router.POST("/signup", UserRegistration)
 
 	v1 := router.Group("/api/v1")
 	v1.GET("/", hello)

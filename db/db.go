@@ -16,6 +16,5 @@ func Init(db *gorm.DB) {
 		&models.Route{},
 		&models.Rider{},
 		&models.GooglePath{},
-		&models.Booking{},
-		&models.Driver{})
+		&models.Booking{})
 }
