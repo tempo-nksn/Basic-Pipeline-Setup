@@ -519,8 +519,10 @@ func makePayment(c *gin.Context){
 	if pay.Walletpay {
 		//Pay through wallet
 		//TODO: Validation before payment
+		log.Print(pay.Fare)
 		rider.Wallet = rider.Wallet - pay.Fare
-		db.Where("id = ?", id).Update(rider)
+		log.Print(rider.Wallet)
+		db.Save(rider)
 		c.JSON(200,"Payment Successful")
 		return
 	} else {
