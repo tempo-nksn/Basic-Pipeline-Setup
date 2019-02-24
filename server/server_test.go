@@ -4,9 +4,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"net/http/httptest"
+	"os"
 
+	"github.com/joho/godotenv"
 	"github.com/tempo-nksn/Tempo-Backend/models"
 
 	"github.com/gin-gonic/gin"
@@ -50,7 +53,21 @@ var _ = Describe("Server", func() {
 	)
 
 	BeforeEach(func() {
-		d, err := gorm.Open("postgres", "postgres://eldbficyapouiq:246af417c764c5c0bbfb23f5e26a69033c45a27c515b81611b3830447b757263@ec2-107-20-167-11.compute-1.amazonaws.com:5432/dfgl7a5728belb")
+		DATABASE := os.Getenv("DB_DRIVER")
+		databaseURL := os.Getenv("DATABASE_URL")
+		if DATABASE == "" && databaseURL == "" {
+			err := godotenv.Load("../.env")
+			if err != nil {
+				log.Fatal("Error loading .env file")
+			}
+			DATABASE = os.Getenv("DB_DRIVER")
+			databaseURL = os.Getenv("DATABASE_URL")
+		}
+		d, err := gorm.Open(DATABASE, databaseURL)
+		if err != nil {
+			log.Fatal(err)
+			panic("failed to establish database connection")
+		}
 		db_test = d
 		if err != nil {
 			panic(err)
