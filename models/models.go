@@ -23,6 +23,7 @@ type Rider struct {
 	Password string `gorm:"type:varchar(40); not null`
 	Email    string
 	PhoneNo  string
+	Wallet   int64
 }
 
 type Taxi struct {
@@ -72,4 +73,11 @@ type Driver struct {
 	Email     string
 	PhoneNo   string
 	LicenseNo string
+}
+// DashBoard Holds data to be sent when dashboard Endpoint hit
+type DashBoard struct {
+	Name   string
+	Email  string
+	Phone  string
+	Wallet int64
 }
