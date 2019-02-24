@@ -34,7 +34,6 @@ type Taxi struct {
 	Capacity               int
 	CurrentNumOfTravellers int
 	Status                 string // Can be one of Free, Active, Full
-	DriverID               uint
 }
 
 type GooglePath struct {
@@ -53,6 +52,7 @@ type Route struct {
 	Source      string
 	Destination string
 	Status      string // can be Active or Passive
+	DriverID    uint
 }
 
 type Booking struct {

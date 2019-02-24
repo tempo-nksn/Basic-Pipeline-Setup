@@ -10,9 +10,9 @@ func setupRoutes(router *gin.Engine) {
 	var dir, _ = os.Getwd()
 	var path string
 	if strings.Contains(dir,"server"){
-		path = "../templates/*"
+		path = "../template/*"
 	}else{
-		path = "templates/*"
+		path = "template/*"
 	}
 	router.LoadHTMLGlob(path)
 
