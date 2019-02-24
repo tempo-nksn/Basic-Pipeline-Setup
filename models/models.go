@@ -34,6 +34,7 @@ type Taxi struct {
 	Capacity               int
 	CurrentNumOfTravellers int
 	Status                 string // Can be one of Free, Active, Full
+	DriverID               uint
 }
 
 type GooglePath struct {
@@ -56,17 +57,23 @@ type Route struct {
 
 type Booking struct {
 	DBModel
-	RouteID uint
-	//Route          Route
-	TaxiID uint
-	//Taxi           Taxi
-	RiderID uint
-	//Rider          Rider
+	RouteID        uint
+	TaxiID         uint
+	RiderID        uint
 	TravelDuration int
 	ETA            int    // How much time a user has to wait till he gets a taxi.
 	Status         string // Can be To_start, Active or Finished
 }
 
+type Driver struct {
+	DBModel
+	Name      string
+	UName     string `gorm:"type:varchar(40); not null`
+	Password  string `gorm:"type:varchar(40); not null`
+	Email     string
+	PhoneNo   string
+	LicenseNo string
+}
 // DashBoard Holds data to be sent when dashboard Endpoint hit
 type DashBoard struct {
 	Name   string
