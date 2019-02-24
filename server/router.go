@@ -9,6 +9,7 @@ import (
 func setupRoutes(router *gin.Engine) {
 	var dir, _ = os.Getwd()
 	var path string
+	//if condition is for test cases and else for running the app from tempo.go
 	if strings.Contains(dir,"server"){
 		path = "../template/*"
 	}else{
@@ -18,8 +19,8 @@ func setupRoutes(router *gin.Engine) {
   
 	authMiddleware := JWT()
 	router.POST("/login", authMiddleware.LoginHandler)
-	router.POST("/signup", UserRegistration)
-  router.GET("/templatetest", templateTest)
+	router.POST("/signup", userRegistration)
+  	router.GET("/templatetest", templateTest)
 	driver:=router.Group("/driver")
 	{
 		driver.GET("/", driverIntro)
