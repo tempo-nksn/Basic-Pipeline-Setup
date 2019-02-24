@@ -9,13 +9,13 @@ import (
 	"github.com/stripe/stripe-go/charge"
 )
 
-func paymentHandler(price int, email string) (bool, string) {
+func paymentHandler(price int64, email string) (bool, string) {
 
 	var sh_key = os.Getenv("SECRET_KEY")
 	stripe.Key = sh_key
 	fmt.Println(sh_key)
 	params := &stripe.ChargeParams{
-		Amount:       stripe.Int64(int64(price)),
+		Amount:       stripe.Int64(price),
 		Currency:     stripe.String(string(stripe.CurrencyJPY)),
 		ReceiptEmail: stripe.String(email),
 	}
