@@ -57,9 +57,9 @@ type Route struct {
 
 type Booking struct {
 	DBModel
-	RouteID        uint
-	TaxiID         uint
-	RiderID        uint
+	RouteID uint
+	TaxiID uint
+	RiderID uint
 	TravelDuration int
 	ETA            int    // How much time a user has to wait till he gets a taxi.
 	Status         string // Can be To_start, Active or Finished

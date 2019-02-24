@@ -15,11 +15,11 @@ func setupRoutes(router *gin.Engine) {
 		path = "template/*"
 	}
 	router.LoadHTMLGlob(path)
-
+  
 	authMiddleware := JWT()
 	router.POST("/login", authMiddleware.LoginHandler)
-	router.POST("/signup", userRegistration)
-	router.GET("/templatetest", templateTest)
+	router.POST("/signup", UserRegistration)
+  router.GET("/templatetest", templateTest)
 	driver:=router.Group("/driver")
 	{
 		driver.GET("/", driverIntro)
@@ -28,9 +28,7 @@ func setupRoutes(router *gin.Engine) {
 		driver.GET("/login", driverLogin)
 		driver.POST("/dashboard", driverDash)
 	}
-
-
-
+  
 	v1 := router.Group("/api/v1")
 	v1.GET("/", hello)
 	v1.GET("/nearbytaxis", getNearByTaxis)
@@ -45,6 +43,7 @@ func setupRoutes(router *gin.Engine) {
 	v1.GET("/getDistance", getDistance)
 	v1.GET("/taxis", testFromDB)
 	dash := v1.Group("/dashboard")
-	dash.Use(authMiddleware.LoginHandler)
+	dash.Use(authMiddleware.MiddlewareFunc())
 	dash.GET("/", getUserDash)
+	dash.POST("/payment", makePayment)
 }

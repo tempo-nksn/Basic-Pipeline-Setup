@@ -6,7 +6,7 @@ import (
 	"log"
 	"math"
 	"math/rand"
-	"net/http"
+  "net/http"
 	"net/url"
 	"os"
 	"strconv"
@@ -113,7 +113,6 @@ func driverDash(c *gin.Context)  {
 
 	c.HTML(http.StatusOK,"dashboard.html",driver)
 }
-
 // getNearByTaxis calculates 3 random taxi location neat the user
 // we are using rand func
 // The randomness is [-0.002500, 0.002500] degrees for both latitude and longitude
