@@ -23,5 +23,5 @@ func setupRoutes(router *gin.Engine) {
 	dash := v1.Group("/dashboard")
 	dash.Use(authMiddleware.MiddlewareFunc())
 	dash.GET("/", getUserDash)
-	dash.GET("payment", makePayment)
+	dash.POST("/payment", makePayment)
 }
