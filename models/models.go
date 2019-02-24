@@ -66,3 +66,11 @@ type Booking struct {
 	ETA            int    // How much time a user has to wait till he gets a taxi.
 	Status         string // Can be To_start, Active or Finished
 }
+
+// DashBoard Holds data to be sent when dashboard Endpoint hit
+type DashBoard struct {
+	Name   string
+	Email  string
+	Phone  string
+	Wallet int64
+}
