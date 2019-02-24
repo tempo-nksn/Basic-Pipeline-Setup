@@ -1,8 +1,13 @@
 package server
 
 import (
+	"bytes"
+	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
+
+	"github.com/tempo-nksn/Tempo-Backend/models"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
@@ -18,6 +23,25 @@ func performRequest(r http.Handler, method, path string) *httptest.ResponseRecor
 	return w
 }
 
+func performGETRequest(r http.Handler, path string, token string) *httptest.ResponseRecorder {
+	req, _ := http.NewRequest("GET", path, nil)
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", token)
+	w := httptest.NewRecorder()
+	r.ServeHTTP(w, req)
+	return w
+}
+
+func performPOSTRequest(r http.Handler, url string, data string) *httptest.ResponseRecorder {
+	var dataBytes = []byte(data)
+	req, _ := http.NewRequest("POST", url, bytes.NewBuffer(dataBytes))
+	req.Header.Set("Content-Type", "application/json")
+	fmt.Println(req)
+	w := httptest.NewRecorder()
+	r.ServeHTTP(w, req)
+	return w
+}
+
 var _ = Describe("Server", func() {
 	var (
 		db_test  *gorm.DB
@@ -26,7 +50,7 @@ var _ = Describe("Server", func() {
 	)
 
 	BeforeEach(func() {
-		d, err := gorm.Open("postgres", "postgres://fpfujvlpxoelcm:93ec17a8d9323c29e05b569ea2bd77fa2d7dc96564d2f5b6eaa521807bf8b787@ec2-54-243-128-95.compute-1.amazonaws.com:5432/d34p830c249n99")
+		d, err := gorm.Open("postgres", "postgres://eldbficyapouiq:246af417c764c5c0bbfb23f5e26a69033c45a27c515b81611b3830447b757263@ec2-107-20-167-11.compute-1.amazonaws.com:5432/dfgl7a5728belb")
 		db_test = d
 		if err != nil {
 			panic(err)
@@ -46,6 +70,53 @@ var _ = Describe("Server", func() {
 
 			It("Returns the String 'Hello User, your taxi is booked'", func() {
 				Expect(response.Body.String()).To(Equal("Hello User, your taxi is booked"))
+			})
+		})
+	})
+	Describe("Version 1 API at /dashboard", func() {
+		Describe("The / endpoint", func() {
+			var user models.DashBoard
+			BeforeEach(func() {
+				var cred = `{
+					"u_name": "test3",
+					"password": "test3"
+				}`
+				r := performPOSTRequest(router, "/login", cred)
+				type Body struct {
+					Code   string
+					Expire string
+					Token  string
+				}
+				var body Body
+				json.Unmarshal(r.Body.Bytes(), &body)
+				// fmt.Println("response is: ", body.Token)
+				var bearer = "Bearer " + body.Token
+				response = performGETRequest(router, "/api/v1/dashboard/", bearer)
+				fmt.Println("response is ", response.Body)
+				json.Unmarshal(response.Body.Bytes(), &user)
+				// claims := jwt.ExtractClaims()
+				// id := claims["id"]
+			})
+			// var user models.DashBoard
+
+			It("Returns with Status 200", func() {
+				Expect(response.Code).To(Equal(200))
+			})
+
+			It("Returns the user's name", func() {
+				Expect(user.Name).To(Equal("Bharath"))
+			})
+
+			It("Returns the user's email'", func() {
+				Expect(user.Email).To(Equal("test3@gmail.com"))
+			})
+
+			It("Returns the user's Phone number'", func() {
+				Expect(user.Phone).To(Equal("123456789"))
+			})
+
+			It("Returns the user's Wallet'", func() {
+				Expect(user.Wallet).To(Equal(int64(13232)))
 			})
 		})
 	})
