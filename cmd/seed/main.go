@@ -34,6 +34,8 @@ func main() {
 		databaseURL = os.Getenv("DATABASE_URL")
 	}
 	// team Roses postgres URL: postgres://fpfujvlpxoelcm:93ec17a8d9323c29e05b569ea2bd77fa2d7dc96564d2f5b6eaa521807bf8b787@ec2-54-243-128-95.compute-1.amazonaws.com:5432/d34p830c249n99
+	log.Print(databaseURL)
+	log.Print(DATABASE)
 	database, err := gorm.Open(DATABASE, databaseURL)
 	if err != nil {
 		panic("failed to establish database connection")

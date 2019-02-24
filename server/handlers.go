@@ -489,6 +489,7 @@ func getUserDash(c *gin.Context) {
 	db := getDB(c)
 	claims := jwt.ExtractClaims(c)
 	id := claims["id"]
+	log.Print(claims)
 
 	var rider models.Rider
 	db.Where("id = ?", id).First(&rider)
