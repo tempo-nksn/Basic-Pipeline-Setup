@@ -1,13 +1,21 @@
 package server
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/gin-gonic/gin"
+	"os"
+	"strings"
+)
 
 func setupRoutes(router *gin.Engine) {
-	//for local
-	//path:= "templates/*"
-	//for circleci
-	path:="/go/src/github.com/tempo-nksn/Tempo-Backend/templates/*"
+	var dir, _ = os.Getwd()
+	var path string
+	if strings.Contains(dir,"server"){
+		path = "../templates/*"
+	}else{
+		path = "templates/*"
+	}
 	router.LoadHTMLGlob(path)
+
 	authMiddleware := JWT()
 	router.POST("/login", authMiddleware.LoginHandler)
 	router.POST("/signup", userRegistration)

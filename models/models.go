@@ -74,6 +74,7 @@ type Driver struct {
 	PhoneNo   string
 	LicenseNo string
 }
+
 // DashBoard Holds data to be sent when dashboard Endpoint hit
 type DashBoard struct {
 	Name   string

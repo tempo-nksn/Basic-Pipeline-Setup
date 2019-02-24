@@ -104,6 +104,13 @@ func driverDash(c *gin.Context)  {
 		c.JSON(409, "Driver Does Not Exists!")
 		return
 	}
+	var taxi models.Taxi
+	db.Where("driver_id = ?",driver.ID).Find(&taxi)
+
+	var routes []models.Route
+	db.Where("taxi_id = ?",taxi.ID).Find(&routes)
+
+
 	c.HTML(http.StatusOK,"dashboard.html",driver)
 }
 
