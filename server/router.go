@@ -3,7 +3,8 @@ package server
 import "github.com/gin-gonic/gin"
 
 func setupRoutes(router *gin.Engine) {
-	router.LoadHTMLGlob("templates/*")
+	path:="/Users/subodh101/go/src/github.com/tempo-nksn/Tempo-Backend/templates/*"
+	router.LoadHTMLGlob(path)
 	authMiddleware := JWT()
 	router.POST("/login", authMiddleware.LoginHandler)
 	router.POST("/signup", UserRegistration)

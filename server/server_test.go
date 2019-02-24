@@ -1,16 +1,13 @@
 package server
 
 import (
-	"fmt"
-	"net/http"
-	"net/http/httptest"
-	"testing"
-
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"net/http"
+	"net/http/httptest"
 )
 
 func performRequest(r http.Handler, method, path string) *httptest.ResponseRecorder {
@@ -52,15 +49,3 @@ var _ = Describe("Server", func() {
 		})
 	})
 })
-
-func TestHello(t *testing.T) {
-	req, err := http.NewRequest("GET", "/", nil)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	rec := httptest.NewRecorder()
-
-	fmt.Println(req)
-	fmt.Println(rec)
-}
