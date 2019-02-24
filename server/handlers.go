@@ -125,16 +125,16 @@ func bookingConfirmation(c *gin.Context) {
 		fmt.Println("FULL")
 	}
 	dbc.Save(&taxi)
-	var rider models.Rider
-	fmt.Println(riderId)
-	dbc.Where("id = ?", riderId).Find(&rider)
-	fmt.Println(rider)
-	var fail, failmsg = paymentHandler(route.Fare, rider.Email)
-	if fail == false {
-		log.Print(failmsg)
-		c.JSON(401, failmsg)
-		return
-	}
+	// var rider models.Rider
+	// fmt.Println(riderId)
+	// dbc.Where("id = ?", riderId).Find(&rider)
+	// fmt.Println(rider)
+	// var fail, failmsg = paymentHandler(route.Fare, rider.Email)
+	// if fail == false {
+	// 	log.Print(failmsg)
+	// 	c.JSON(401, failmsg)
+	// 	return
+	// }
 	dbc.Create(&booking)
 	c.JSON(200, booking)
 
@@ -496,4 +496,42 @@ func getUserDash(c *gin.Context) {
 	var dash = models.DashBoard{ Name : rider.Name, Email : rider.Email,
 								 Phone: rider.PhoneNo, Wallet: rider.Wallet }
 	c.JSON(200, dash)
+}
+
+func makePayment(c *gin.Context){
+	db := getDB(c)
+	claims := jwt.ExtractClaims(c)
+	id := claims["id"]
+
+	type payDetails struct {
+		Name string `form:"Name" json:"Name" binding:"required"`
+		Fare int64 `form:"Fare" json:"Fare" binding:"required"`
+		Email string `form:"Email" json:"Email" binding:"required"`
+		Walletpay bool `form:"Walletpay" json:"Walletpay" binding:"required"`
+	}
+	//Binding from body of post request
+	var pay payDetails
+	c.BindJSON(&pay)
+
+	var rider models.Rider
+	fmt.Println("Making payment for: ",id)
+	db.Where("id = ?", id).Find(&rider)
+	if pay.Walletpay {
+		//Pay through wallet
+		//TODO: Validation before payment
+		rider.Wallet = rider.Wallet - pay.Fare
+		db.Where("id = ?", id).Update(rider)
+		c.JSON(200,"Payment Successful")
+		return
+	} else {
+		//Pay through card
+		var fail, failmsg = paymentHandler(pay.Fare, rider.Email)
+		if fail == false {
+			log.Print(failmsg)
+			c.JSON(401, failmsg)
+			return
+		}
+		c.JSON(200,"Payment Successful")
+	}
+	
 }
