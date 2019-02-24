@@ -125,21 +125,11 @@ func bookingConfirmation(c *gin.Context) {
 		fmt.Println("FULL")
 	}
 	dbc.Save(&taxi)
-	// var rider models.Rider
-	// fmt.Println(riderId)
-	// dbc.Where("id = ?", riderId).Find(&rider)
-	// fmt.Println(rider)
-	// var fail, failmsg = paymentHandler(route.Fare, rider.Email)
-	// if fail == false {
-	// 	log.Print(failmsg)
-	// 	c.JSON(401, failmsg)
-	// 	return
-	// }
 	dbc.Create(&booking)
 	c.JSON(200, booking)
 
 	// last) Respond to the server saying booking is done, return a string saying "booking done"
-	//c.String(200, "Booking done")
+	// c.String(200, "Booking done")
 }
 
 func startRide(c *gin.Context) {
