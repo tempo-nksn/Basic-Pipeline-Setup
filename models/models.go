@@ -23,6 +23,7 @@ type Rider struct {
 	Password string `gorm:"type:varchar(40); not null`
 	Email    string
 	PhoneNo  string
+	Wallet   int64
 }
 
 type Taxi struct {
