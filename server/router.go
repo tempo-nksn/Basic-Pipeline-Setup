@@ -22,5 +22,5 @@ func setupRoutes(router *gin.Engine) {
 	v1.GET("/taxis", testFromDB)
 	dash := v1.Group("/dashboard")
 	dash.Use(authMiddleware.LoginHandler)
-	dash.GET("/dashboard", getUserDash)
+	dash.GET("/", getUserDash)
 }
