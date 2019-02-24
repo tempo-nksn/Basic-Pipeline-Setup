@@ -96,7 +96,6 @@ func driverLogin(c *gin.Context) {
 
 func driverDash(c *gin.Context)  {
 	username:=c.PostForm("username")
-	//password:=c.PostForm("password")
 	db := getDB(c)
 	var driver models.Driver
 	db.Where("u_name = ?",username).Find(&driver)

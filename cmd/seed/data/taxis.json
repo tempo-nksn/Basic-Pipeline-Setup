@@ -5,7 +5,8 @@
         "CurrentLocation":        "56.346734,78.078924",
         "Capacity"        :       4,
         "CurrentNumOfTravellers": 0,
-        "Status"                 :  "Free"
+        "Status"                 :  "Free",
+      "DriverID": 1
     },
     {
         "NumberPlate":            "XYZ123",
@@ -13,6 +14,7 @@
         "CurrentLocation":        "36.346734,38.078924",
         "Capacity"        :       3,
         "CurrentNumOfTravellers": 1,
-        "Status"                 :  "Active"
+        "Status"                 :  "Active",
+      "DriverID":2
     }
 ]
