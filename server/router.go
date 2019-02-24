@@ -3,12 +3,25 @@ package server
 import "github.com/gin-gonic/gin"
 
 func setupRoutes(router *gin.Engine) {
+	router.LoadHTMLGlob("templates/*")
 	authMiddleware := JWT()
 	router.POST("/login", authMiddleware.LoginHandler)
 	router.POST("/signup", UserRegistration)
+	router.GET("/templatetest", TemplateTest)
+	driver:=router.Group("/driver")
+	{
+		driver.GET("/", Driver)
+		driver.GET("/registration", DriverReg)
+		driver.POST("/registering", Registering)
+		driver.GET("/login", DriverLogin)
+		driver.POST("/dashboard", DriverDash)
+
+	}
+
+
 
 	v1 := router.Group("/api/v1")
-	v1.GET("/",hello)
+	v1.GET("/", Hello)
 	v1.GET("/nearbytaxis", getNearByTaxis)
 	v1.GET("/getRoute", getRoute)
 	v1.GET("/userid", createRider)

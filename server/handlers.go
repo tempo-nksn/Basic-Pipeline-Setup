@@ -6,6 +6,7 @@ import (
 	"log"
 	"math"
 	"math/rand"
+	"net/http"
 	"net/url"
 	"os"
 	"strconv"
@@ -33,7 +34,7 @@ func getDB(c *gin.Context) *gorm.DB {
 	return c.MustGet(constants.ContextDB).(*gorm.DB)
 }
 
-func hello(c *gin.Context) {
+func Hello(c *gin.Context) {
 	c.String(200, "Hello User, your taxi is booked")
 }
 
@@ -49,6 +50,59 @@ func UserRegistration(c *gin.Context) {
 		db.Create(&newuser)
 		c.JSON(201, "User added successfully!")
 	}
+}
+
+func TemplateTest(c *gin.Context) {
+	c.HTML(http.StatusOK, "test.html",
+		gin.H{"title": "Main Website"}, )
+}
+
+func Driver(c *gin.Context) {
+	// introduction of our driver's life
+	fmt.Println("introduction of our driver's life", c)
+	fmt.Println("add login and submit button here")
+}
+
+func DriverReg(c *gin.Context) {
+	c.HTML(http.StatusOK, "registration.html", nil)
+}
+func Registering(c *gin.Context) {
+	db := getDB(c)
+	email := c.PostForm("email")
+	var driver models.Driver
+	db.Where("email = ?", email).Find(&driver)
+	if driver.UName != "" {
+		c.JSON(409, "Driver Already Exists")
+		return
+	}
+	driver = models.Driver{
+		UName:     c.PostForm("u_name"),
+		Name:      c.PostForm("name"),
+		Password:  c.PostForm("password"),
+		Email:     email,
+		PhoneNo:   c.PostForm("phone_no"),
+		LicenseNo: c.PostForm("license_no"),
+	}
+	db.Create(&driver)
+	fmt.Printf("Driver %s added successfully!", driver.Name)
+	c.Redirect(http.StatusFound, "/driver/login")
+}
+
+func DriverLogin(c *gin.Context) {
+	c.HTML(http.StatusOK, "login.html", nil)
+}
+
+func DriverDash(c *gin.Context)  {
+	username:=c.PostForm("username")
+	//password:=c.PostForm("password")
+	db := getDB(c)
+	var driver models.Driver
+	db.Where("u_name = ?",username).Find(&driver)
+	if driver.Email == "" {
+		c.JSON(409, "Driver Does Not Exists!")
+		return
+	}
+	c.HTML(http.StatusOK,"dashboard.html",driver)
 }
 
 // getNearByTaxis calculates 3 random taxi location neat the user
