@@ -1,12 +1,35 @@
 package server
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/gin-gonic/gin"
+	"os"
+	"strings"
+)
 
 func setupRoutes(router *gin.Engine) {
+	var dir, _ = os.Getwd()
+	var path string
+	//if condition is for test cases and else for running the app from tempo.go
+	if strings.Contains(dir,"server"){
+		path = "../template/*"
+	}else{
+		path = "template/*"
+	}
+	router.LoadHTMLGlob(path)
+  
 	authMiddleware := JWT()
 	router.POST("/login", authMiddleware.LoginHandler)
-	router.POST("/signup", UserRegistration)
-
+	router.POST("/signup", userRegistration)
+  	router.GET("/templatetest", templateTest)
+	driver:=router.Group("/driver")
+	{
+		driver.GET("/", driverIntro)
+		driver.GET("/registration", driverReg)
+		driver.POST("/registering", registering)
+		driver.GET("/login", driverLogin)
+		driver.POST("/dashboard", driverDash)
+	}
+  
 	v1 := router.Group("/api/v1")
 	v1.GET("/", hello)
 	v1.GET("/nearbytaxis", getNearByTaxis)
