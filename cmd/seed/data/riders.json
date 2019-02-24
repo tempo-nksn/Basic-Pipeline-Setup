@@ -4,27 +4,31 @@
     "UName": "test1",
     "Password": "test1",
     "Email": "test1@gmail.com",
-    "PhoneNo": "123456789"
+    "PhoneNo": "123456789",
+    "Wallet" : 10000
   },
   {
     "Name": "Prashant",
     "UName": "test2",
     "Password": "test2",
     "Email": "test2@gmail.com",
-    "PhoneNo": "123456789"
+    "PhoneNo": "123456789",
+    "Wallet" : 15050
   },
   {
     "Name": "Bharath",
     "UName": "test3",
     "Password": "test3",
     "Email": "test3@gmail.com",
-    "PhoneNo": "123456789"
+    "PhoneNo": "123456789",
+    "Wallet" : 13232
   },
   {
     "Name": "Subodh",
     "UName": "test4",
     "Password": "test4",
     "Email": "test4@gmail.com",
-    "PhoneNo": "123456789"
+    "PhoneNo": "123456789",
+    "Wallet" : 234234
   }
 ]
