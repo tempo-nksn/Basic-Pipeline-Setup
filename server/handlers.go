@@ -491,8 +491,8 @@ func getUserDash(c *gin.Context) {
 	id := claims["id"]
 
 	var rider models.Rider
-	db.Where("user_id = ?", id).First(&rider)
-	var dash = models.DashBoard{ Name : rider.UName, Email : rider.Email,
+	db.Where("id = ?", id).First(&rider)
+	var dash = models.DashBoard{ Name : rider.Name, Email : rider.Email,
 								 Phone: rider.PhoneNo, Wallet: rider.Wallet }
 	c.JSON(200, dash)
 }
